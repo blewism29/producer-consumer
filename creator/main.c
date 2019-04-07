@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     sem_t * semaphore = createSemaphore ();
     removeSemaphore ();
     
-    createSharedVariables ("Test", 1);
+    createSharedVariables ("test", 1000);
     deleteSharedVariables ();
 
     return 0;
