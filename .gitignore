@@ -1,3 +1,5 @@
 main
 /creator/main
 .vscode
+/consumer/main
+tmp/*

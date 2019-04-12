@@ -14,10 +14,10 @@
 int protection = PROT_READ | PROT_WRITE;
 int visibility = MAP_SHARED;
 
-char* bufferAddress;
-char* consumersCounterAddress;
-char* producersCounterAddress;
-char* globalStopFlagAddress;
+void* bufferAddress;
+void* consumersCounterAddress;
+void* producersCounterAddress;
+void* globalStopFlagAddress;
 
 int bufferFile;
 int consumerCounterFile;
@@ -40,6 +40,7 @@ void createBuffer (char * pName, size_t pSize) {
     if (bufferFile < 0) printf("ERROR | Error while opening the buffer file %i\n", bufferFile);
     
     bufferAddress = mmap(NULL, pSize, protection, visibility, bufferFile, 0);
+    if (bufferAddress == MAP_FAILED) printf("ERROR | Buffer address map failed\n");
 }
 
 void createCounters () {
@@ -54,13 +55,21 @@ void createCounters () {
     consumerCounterFile = open(parsedName, O_RDWR | O_CREAT);
     if (consumerCounterFile < 0) printf("ERROR | Error while opening the consumers file %i\n", consumerCounterFile);
 
+    //ftruncate(consumerCounterFile, sizeof(int));
+
     consumersCounterAddress = mmap(NULL, sizeof(int), protection, visibility, consumerCounterFile, 0);
+    if (consumersCounterAddress == MAP_FAILED) printf("ERROR | Consumer address map failed\n");
+
+    ssize_t s = write(STDOUT_FILENO, consumersCounterAddress, sizeof(int));
+
     producersCounterAddress = mmap(NULL, sizeof(int), protection, visibility, -1, 0);
+    if (producersCounterAddress == MAP_FAILED) printf("ERROR | Producer address map failed\n");
 }
 
 void createGlobalFlags () {
     printf("DEBUG | Creating shared flags\n");
     globalStopFlagAddress = mmap(NULL, sizeof(int), protection, visibility, -1, 0);
+    if (globalStopFlagAddress == MAP_FAILED) printf("ERROR | Global stop flag address map failed\n");
 }
 
 void createSharedVariables (char * pName, size_t pSize) {

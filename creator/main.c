@@ -10,9 +10,11 @@
 int main(int argc, char *argv[])
 {
     sem_t * semaphore = createSemaphore ();
-    removeSemaphore ();
-    
     createSharedVariables ("test", 1000);
+    
+    getchar();
+
+    removeSemaphore ();
     deleteSharedVariables ();
 
     return 0;
